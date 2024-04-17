@@ -1,0 +1,24 @@
+{
+  "name": "node-koa",
+  "version": "1.0.0",
+  "description": "",
+  "main": "http.js",
+  "scripts": {
+    "koa": "nodemon koa.js",
+    "http": "nodemon http.js",
+    "docker:build": "docker-compose build",
+    "docker:build_run": "docker-compose up"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "koa": "^2.15.3",
+    "koa-bodyparser": "^4.4.1",
+    "koa-router": "^12.0.1",
+    "koa-static": "^5.0.0",
+    "koa2-cors": "^2.0.6",
+    "mongoose": "^8.3.1",
+    "mongoose-update-if-current": "^1.4.0",
+    "nodemon": "^3.1.0"
+  }
+}
