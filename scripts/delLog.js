@@ -12,6 +12,6 @@ const del = (src) => {
 fs.readdir('logger/logs/', (err, files) => {
   files.forEach((filename) => {
     let src = path.join('logger/logs/', filename)
-    src && del(src)
+    filename.includes('.log') && del(src)
   })
 })
