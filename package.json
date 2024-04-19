@@ -4,21 +4,32 @@
   "description": "",
   "main": "http.js",
   "scripts": {
+    "delLog": "node ./scripts/delLog.js",
     "koa": "nodemon koa.js",
     "http": "nodemon http.js",
-    "docker:build": "docker-compose build",
-    "docker:build_run": "docker-compose up"
+    "build:uglify": "ncc build koa.js -m -o dist",
+    "docker:build": "yarn delLog && docker-compose build",
+    "docker:build_run": "yarn delLog && docker-compose up"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@vercel/ncc": "^0.38.1",
+    "jsonwebtoken": "8.5.1",
     "koa": "^2.15.3",
     "koa-bodyparser": "^4.4.1",
+    "koa-bouncer": "^6.0.4",
+    "koa-jwt": "4.0.3",
+    "koa-log4": "^2.3.2",
+    "koa-logger": "^3.2.1",
+    "koa-onerror": "^4.2.0",
     "koa-router": "^12.0.1",
+    "koa-session": "^6.4.0",
     "koa-static": "^5.0.0",
     "koa2-cors": "^2.0.6",
     "mongoose": "^8.3.1",
     "mongoose-update-if-current": "^1.4.0",
-    "nodemon": "^3.1.0"
+    "nodemon": "^3.1.0",
+    "trek-captcha": "^0.4.0"
   }
 }
