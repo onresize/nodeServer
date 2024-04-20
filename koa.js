@@ -5,10 +5,16 @@ const static = require('koa-static')
 const onerror = require('koa-onerror')
 const session = require('koa-session')
 const bouncer = require('koa-bouncer')
+const conditional = require('koa-conditional-get');
+const etag = require('koa-etag');
 const router = require('./routes')
 const app = new koa()
 
 app.use(bouncer.middleware()) // bouncer校验
+
+// 使用中间件设置协商缓存
+app.use(conditional());
+app.use(etag());
 
 app.keys = ['some secret hurr']
 const SESSION_CONFIG = {
@@ -50,5 +56,5 @@ app.use(require('koa-bodyparser')())
 app.use(require('koa2-cors')())
 app.use(router.routes()).use(router.allowedMethods())
 app.listen(3000, () => {
-  console.log('服务已启动port：http://localhost:3000/')
+  console.log('koa服务已启动port：http://localhost:3000/')
 })

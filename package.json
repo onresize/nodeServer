@@ -7,6 +7,7 @@
     "delLog": "node ./scripts/delLog.js",
     "koa": "nodemon koa.js",
     "http": "nodemon http.js",
+    "express": "nodemon express.js",
     "build:uglify": "ncc build koa.js -m -o dist",
     "docker:build": "yarn delLog && docker-compose build",
     "docker:build_run": "yarn delLog && docker-compose up"
@@ -15,10 +16,14 @@
   "license": "ISC",
   "dependencies": {
     "@vercel/ncc": "^0.38.1",
+    "etag": "^1.8.1",
+    "express": "^4.19.2",
     "jsonwebtoken": "8.5.1",
     "koa": "^2.15.3",
     "koa-bodyparser": "^4.4.1",
     "koa-bouncer": "^6.0.4",
+    "koa-conditional-get": "^3.0.0",
+    "koa-etag": "^4.0.0",
     "koa-jwt": "4.0.3",
     "koa-log4": "^2.3.2",
     "koa-logger": "^3.2.1",

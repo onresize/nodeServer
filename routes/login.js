@@ -106,6 +106,9 @@ router.get('/getCaptcha', async (ctx) => {
     .on('finish', () => console.log('图形验证码：', token))
     .end(buffer)
 
+  // 设置强缓存、10s之内请求都走缓存
+  // ctx.set('Cache-Control', 'max-age=10')
+
   ctx.body = {
     code: '200',
     data: `http://localhost:3000/code.gif`,
