@@ -7,8 +7,8 @@
     "delLog": "node ./scripts/delLog.js",
     "koa": "nodemon koa.js",
     "http": "nodemon http.js",
-    "socket": "nodemon socket.js",
     "express": "nodemon express.js",
+    "socket": "nodemon socket.js",
     "build:uglify": "ncc build koa.js -m -o dist",
     "docker:build": "yarn delLog && docker-compose build",
     "docker:build_run": "yarn delLog && docker-compose up"
