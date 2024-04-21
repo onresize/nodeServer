@@ -7,6 +7,7 @@
     "delLog": "node ./scripts/delLog.js",
     "koa": "nodemon koa.js",
     "http": "nodemon http.js",
+    "socket": "nodemon socket.js",
     "express": "nodemon express.js",
     "build:uglify": "ncc build koa.js -m -o dist",
     "docker:build": "yarn delLog && docker-compose build",
@@ -35,6 +36,7 @@
     "mongoose": "^8.3.1",
     "mongoose-update-if-current": "^1.4.0",
     "nodemon": "^3.1.0",
+    "socket.io": "^4.7.5",
     "trek-captcha": "^0.4.0"
   }
 }

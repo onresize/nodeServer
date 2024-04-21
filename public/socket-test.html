@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- 10秒刷新一次网页 -->
+    <!-- <meta http-equiv="refresh" content="10"> -->
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>socket测试</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+
+    <style>
+      .flex {
+        width: 100%;
+        display: flex;
+      }
+      .card {
+        box-sizing: border-box;
+        box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.12);
+        border: 1px solid #e4e7ed;
+        border-radius: 10px;
+        width: fit-content;
+        padding: 10px;
+        margin: 10px;
+      }
+      .active {
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div>
+        <button @click="createWebSocketConnection" :disabled="name !== ''">
+          建立Websocket连接</button
+        >&nbsp; <button @click="close">主动断开连接</button>&nbsp;
+        <span v-show="name"
+          >当前用户：<span style="color: red; font-weight: bolder;">{{ name }}</span></span
+        >
+
+        <div class="flex">
+          <!-- 单聊 -->
+          <div class="card">
+            <ul>
+              <li
+                v-for="i in userList"
+                :key="i.id"
+                @click=";(chooseUser = i.username), (chooseid = i.id)"
+                :class="{ active: i.username === chooseUser }"
+              >
+                {{ i.username }}
+              </li>
+            </ul>
+            <div class="text">
+              <input
+                type="text"
+                v-model="message"
+                @focus="handleFocus"
+                @blur="handleBlur"
+              />
+              &nbsp;<button @click="perSonSendMessage">
+                <span style="color: red">单聊</span>发送信息
+              </button>
+            </div>
+            <h1>{{ typing }}</h1>
+
+            <!-- 聊天内容 -->
+            <div class="chat">
+              <ul>
+                <li v-for="i in messageList" :key="i.id">
+                  <p>
+                    发送者：{{ i.sendForm }} ,接收者：{{ i.toUser }},内容：{{
+                    i.message }}
+                  </p>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- 群聊 -->
+          <div class="card">
+            <h3 align="center">在线人数：{{ userList.length }}</h3>
+            <div class="text">
+              <input type="text" v-model="roomMessage" />
+              &nbsp;<button @click="roomSendMessage">
+                <span style="color: red">群聊</span>发送信息
+              </button>
+            </div>
+
+            <!-- 聊天内容 -->
+            <div class="chat">
+              <ul>
+                <li v-for="i in roomMessageList" :key="i">
+                  <p>发送者：{{ i.sendForm }} ,内容：{{ i.message }}</p>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script>
+    const { createApp, onUnmounted, ref } = Vue
+    const app = createApp({
+      setup() {
+        const name = ref('')
+        const userList = ref([])
+        const message = ref('')
+        const roomMessage = ref('')
+        const messageList = ref([])
+        const roomMessageList = ref([])
+        //选择当前需要发送信息的对象
+        const chooseUser = ref('')
+        const chooseid = ref('')
+        //谁正在输入中
+        const typing = ref('')
+        let socket = null
+
+        const createWebSocketConnection = () => {
+          name.value = window.prompt(
+            '请输入用户名',
+            `yzw${(+new Date() + '').slice(10)}`
+          )
+          if (!name.value) {
+            name.value = ''
+            return
+          }
+
+          //随机生成一个username
+          socket = io('http://localhost:5000', {
+            query: { username: name.value },
+          })
+          socket.on('connect', () => {
+            console.log('连接成功')
+            console.log(socket.id)
+          })
+          socket.on('disconnect', () => {
+            console.log('断开连接') // undefined
+          })
+
+          socket.on('userList', (data) => {
+            console.log('监听userList', data)
+            userList.value = data
+          })
+          //监听接收信息
+          socket.on('receiveMessage', (data) => {
+            messageList.value.push(data)
+          })
+          socket.on('roomReceiveMessage', (data) => {
+            roomMessageList.value.push(data)
+          })
+          socket.on('receiveTyping', (data) => {
+            console.log(data)
+            typing.value = data.message
+          })
+          socket.on('receiveStopTyping', (id) => {
+            typing.value = ''
+          })
+        }
+
+        const closeWebSocket = () => {
+          socket.close()
+        }
+
+        // 单聊
+        const perSonSendMessage = () => {
+          if (!chooseid.value)
+            return window.alert('请先选择要发送的对象后重试!')
+          const messageData = {
+            sendForm: name.value, //发送对象
+            receiveForm: chooseUser.value, //接受对象
+            time: new Date(), //时间
+            id: chooseid.value,
+            message: message.value,
+          }
+          socket.emit('perSonSendMessage', messageData)
+          message.value = ''
+        }
+
+        // 群聊
+        const roomSendMessage = () => {
+          const messageData = {
+            sendForm: name.value, //发送对象
+            message: roomMessage.value,
+          }
+          socket.emit('roomSendMessage', messageData)
+          roomMessage.value = ''
+        }
+
+        //监听用户正在输入中
+        const handleFocus = () => {
+          const data = {
+            username: name.value,
+            tousername: chooseUser.value,
+            id: chooseid.value,
+            message: `${name.value} 正在输入中...`,
+          }
+          socket.emit('typing', data)
+        }
+
+        //监听用户停止输入
+        const handleBlur = () => {
+          socket.emit('stopTyping', chooseid.value)
+        }
+
+        const close = () => {
+          socket.emit('close', name.value || name.value)
+          closeWebSocket()
+          userList.value = ''
+          name.value = ''
+          messageList.value = []
+          roomMessageList.value = []
+        }
+
+        onUnmounted(close)
+
+        return {
+          name,
+          userList,
+          message,
+          roomMessage,
+          messageList,
+          roomMessageList,
+          chooseUser,
+          chooseid,
+          typing,
+          socket,
+          createWebSocketConnection,
+          closeWebSocket,
+          perSonSendMessage,
+          roomSendMessage,
+          handleBlur,
+          close,
+        }
+      },
+    })
+
+    app.mount('#app')
+  </script>
+</html>
