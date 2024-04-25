@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>入口页</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <style>
+      #qrcode {
+        margin: 10px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="qrcode"></div>
+    <button id="buildSubmit">创建SSE连接并生成二维码</button>
+    <button onclick="closeFunc()">关闭连接</button>
+    <pre><code id="app"></code></pre>
+
+    <script>
+      let SSE = null
+      let QrCodeIp = null
+      const domain = '127.0.0.1'
+      const port = 3000
+
+      const actionApi = (url, params = {}) => {
+        return new Promise((resolve, reject) => {
+          $.ajax({
+            url: `http://${domain}:${port}/api/${url}`,
+            method: 'get',
+            data: params,
+            // 成功回调
+            success: (res) => {
+              resolve(res)
+            },
+            error: (err) => {
+              reject(err)
+            },
+          })
+        })
+      }
+
+      buildSubmit.onclick = () => {
+        // 通过 new EventSource 开启 SSE
+        SSE = new EventSource(`http://${domain}:${port}/api/push`)
+        // 默认事件
+        SSE.onmessage = (event) => {
+          event.data.includes('192.168') && (QrCodeIp = event.data)
+          app.innerHTML += `${event.data} \n`
+          // event.data && closeFunc() // 终止连接
+        }
+        SSE.onerror = (err) => {
+          console.error(err)
+        }
+        SSE.onopen = () => {
+          console.log('SSE连接成功、可以开始消息推送了')
+        }
+
+        setTimeout(() => {
+          let qrcode = new QRCode(document.getElementById('qrcode'), {
+            width: 100,
+            height: 100,
+          })
+          qrcode.makeCode(`http://${QrCodeIp}:${port}/api/connect`)
+        }, 0.5e3)
+      }
+
+      const closeFunc = () => {
+        console.log('关闭连接')
+        app.innerHTML = ''
+        const parent = document.getElementById('qrcode')
+        const childNodes = parent.childNodes
+        for (let i = childNodes.length; i--; ) {
+          parent.removeChild(childNodes[i])
+        }
+        SSE?.close()
+        actionApi('close')
+      }
+    </script>
+  </body>
+</html>
