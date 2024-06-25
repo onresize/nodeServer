@@ -4,7 +4,7 @@ const path = require('path');
 const axios = require('axios');
 
 // 目标网站 URL
-const targetURL = 'https://onresize.github.io/web-blogs/'; // 替换为你要爬取的网站
+const targetURL = 'https://bizhi.vercel.app'; // 替换为你要爬取的网站
 
 // 下载图片的目录
 const downloadDir = path.join(__dirname, 'spider_Images');

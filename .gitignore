@@ -120,3 +120,5 @@ out
 .yarn/install-state.gz
 .pnp.*
 .vercel
+
+spider_Images/*
