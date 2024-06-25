@@ -1,5 +1,5 @@
 {
-  "name": "koa-node",
+  "name": "nodeServer",
   "version": "1.0.0",
   "description": "",
   "main": "http.js",
@@ -10,6 +10,7 @@
     "express": "nodemon express.js",
     "sse": "nodemon sse.js",
     "socket": "nodemon socket.js",
+    "spiderWeb": "nodemon spiderWeb.js",
     "build:uglify": "ncc build koa.js -m -o dist",
     "docker:build": "yarn delLog && docker-compose build",
     "docker:build_run": "yarn delLog && docker-compose up"
@@ -18,6 +19,7 @@
   "license": "ISC",
   "dependencies": {
     "@vercel/ncc": "^0.38.1",
+    "axios": "^1.7.2",
     "etag": "^1.8.1",
     "express": "^4.19.2",
     "jsonwebtoken": "8.5.1",
@@ -38,6 +40,7 @@
     "mongoose": "^8.3.1",
     "mongoose-update-if-current": "^1.4.0",
     "nodemon": "^3.1.0",
+    "puppeteer": "^22.12.0",
     "socket.io": "^4.7.5",
     "trek-captcha": "^0.4.0"
   }
